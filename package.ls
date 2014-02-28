@@ -2,8 +2,8 @@
 author:
   name: ['Poga Po']
   email: 'poga@poga.tw'
-name: 'pgrest-firebase'
-description: 'firebase api with schemaless storage on PgREST'
+name: 'pgrest-schemaless'
+description: 'a schemaless database with firebase API on PgREST'
 version: '0.0.1'
 main: \lib/index.js
 repository:

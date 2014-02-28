@@ -8,7 +8,7 @@ require! pgrest
 var plx
 
 SCHEMA = \public
-TABLE = \pgrest_firebase_storage
+TABLE = \pgrest_schemaless_storage
 
 describe 'Storage' ->
   beforeEach (done) ->

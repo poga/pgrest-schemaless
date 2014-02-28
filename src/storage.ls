@@ -10,6 +10,7 @@ export function create-storage-table (plx, schema, table, cb)
   );
   """
   cb?!
+
 export function validate-storage-table-exists (plx, schema, table, cb)
   query = """
   SELECT EXISTS(
