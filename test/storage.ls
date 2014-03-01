@@ -1,7 +1,7 @@
 should = (require \chai).should!
 {expect} = require \chai
 {mk-pgrest-fortest} = require \./testlib
-{validate-storage-table-exists, validate-storage-table-schema, create-storage-table} = require \../lib/storage
+{mount-storage, validate-storage-table-exists, validate-storage-table-schema, create-storage-table} = require \../lib/storage
 
 require! pgrest
 
@@ -74,3 +74,38 @@ describe 'Storage' ->
         <- validate-storage-table-schema plx, SCHEMA, TABLE
         it.should.be.ok
         done!
+  describe 'mount storage' ->
+    beforeEach (done) ->
+      <- plx.query "DROP TABLE IF EXISTS #{TABLE};"
+      done!
+    afterEach (done) ->
+      <- plx.query "DROP TABLE IF EXISTS #{TABLE};"
+      done!
+    describe 'when table does not exist', -> ``it``
+      .. 'should create table and return a Storage object', (done) ->
+        storage <- mount-storage plx, SCHEMA, TABLE
+        storage.should.be.ok
+        done!
+    describe 'when a valid table already exists', -> ``it``
+      .. 'should return a storage object with existing table', (done) ->
+        <- plx.query """
+        CREATE TABLE #TABLE (
+          name text,
+          data json
+        );
+        """
+        storage <- mount-storage plx, SCHEMA, TABLE
+        storage.should.be.ok
+        done!
+    describe 'when a invalid table already exists', -> ``it``
+      .. 'should throw error', (done) ->
+        <- plx.query """
+        CREATE TABLE #TABLE (
+          name text,
+          foo int
+        );
+        """
+        storage <- mount-storage plx, SCHEMA, TABLE
+        storage.should.be.an.instanceof Error
+        done!
+

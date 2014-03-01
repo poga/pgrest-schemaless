@@ -1,6 +1,18 @@
 {assert} = require \chai
 lo = require 'lodash-node'
 
+export function mount-storage (plx, schema, table, cb)
+  exists <- validate-storage-table-exists plx, schema, table
+  if exists
+    valid <- validate-storage-table-schema plx, schema, table
+    if valid
+      cb new Storage plx, schema, table
+    else
+      cb new Error "#schema.#table already exists and does not have correct schema"
+  else
+    <- create-storage-table(plx, schema, table)
+    cb new Storage plx, schema, table
+
 export function create-storage-table (plx, schema, table, cb)
   <- plx.query """
   DROP TABLE IF EXISTS #table;
@@ -41,3 +53,10 @@ export function validate-storage-table-schema (plx, schema, table, cb)
     cb? false
     return
   cb? yes
+
+class Storage
+  (plx, schema, table) ->
+    @plx = plx
+    @schema = schema
+    @table = table
+
