@@ -2,6 +2,7 @@
 {validate-storage-table-exists, validate-storage-table-schema} = require './validation'
 
 export function mount-storage (plx, schema, table, cb)
+  <- plx.import-bundle 'fast-json-patch', require.resolve("fast-json-patch/package.json")
   exists <- validate-storage-table-exists plx, schema, table
   if exists
     valid <- validate-storage-table-schema plx, schema, table

@@ -20,6 +20,7 @@ engines: {node: '*'}
 dependencies:
   primus: \*
   'lodash-node': \*
+  'fast-json-patch': \*
 devDependencies:
   mocha: \*
   supertest: \0.7.x

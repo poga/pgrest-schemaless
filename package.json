@@ -22,7 +22,8 @@
   },
   "dependencies": {
     "primus": "*",
-    "lodash-node": "*"
+    "lodash-node": "*",
+    "fast-json-patch": "*"
   },
   "devDependencies": {
     "mocha": "*",

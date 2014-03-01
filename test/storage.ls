@@ -65,4 +65,11 @@ describe 'Storage' ->
         storage <- mount-storage plx, SCHEMA, TABLE
         storage.should.be.an.instanceof Error
         done!
+    describe 'user functions', -> ``it``
+      .. 'should import fast-json-path into plv8', (done) ->
+        <- plx.query """
+        select ~> 'obj = {}; require("fast-json-patch").apply(obj, [{op: "add", path: "/new", value: "new_value"}]); return obj;' as result;
+        """
+        it.should.deep.eq [ {result: { new: 'new_value'}}]
+        done!
 
