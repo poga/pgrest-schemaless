@@ -67,6 +67,7 @@ describe 'Storage' ->
         done!
     describe 'user functions', -> ``it``
       .. 'should import fast-json-path into plv8', (done) ->
+        storage <- mount-storage plx, SCHEMA, TABLE
         <- plx.query """
         select ~> 'obj = {}; require("fast-json-patch").apply(obj, [{op: "add", path: "/new", value: "new_value"}]); return obj;' as result;
         """
