@@ -87,4 +87,11 @@ describe 'Storage' ->
         """
         it.should.include.something.that.deep.equals proname: 'apply_patch'
         done!
+      .. 'imported user function should work properly', (done) ->
+        storage <- mount-storage plx, SCHEMA, TABLE
+        <- plx.query """
+        select apply_patch('{}'::json, ARRAY['{"op": "add", "path": "/new", "value": "new"}'::json]) as ret;
+        """
+        it.should.deep.eq [ ret: new: 'new']
+        done!
 
