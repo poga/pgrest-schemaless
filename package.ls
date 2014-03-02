@@ -20,11 +20,12 @@ engines: {node: '*'}
 dependencies:
   primus: \*
   'lodash-node': \*
-  'fast-json-patch': \*
+  jsonpatch: \*
 devDependencies:
   mocha: \*
   supertest: \0.7.x
   chai: \*
+  'chai-things': \*
   LiveScript: \1.2.x
   pgrest: \0.1.x
   gulp: \*

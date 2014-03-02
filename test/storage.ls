@@ -1,8 +1,11 @@
-should = (require \chai).should!
+require! chai
+should = chai.should!
+chai.use require 'chai-things'
 {expect} = require \chai
 {mk-pgrest-fortest} = require \./testlib
 {mount-storage, create-storage-table} = require \../lib/storage
 {validate-storage-table-exists, validate-storage-table-schema} = require \../lib/validation
+lo = require 'lodash-node'
 
 require! pgrest
 
@@ -65,12 +68,23 @@ describe 'Storage' ->
         storage <- mount-storage plx, SCHEMA, TABLE
         storage.should.be.an.instanceof Error
         done!
-    describe 'user functions', -> ``it``
-      .. 'should import fast-json-path into plv8', (done) ->
+    describe 'mount-storage', -> ``it``
+      .. 'should import jsonpatch into plv8', (done) ->
         storage <- mount-storage plx, SCHEMA, TABLE
         <- plx.query """
-        select ~> 'obj = {}; require("fast-json-patch").apply(obj, [{op: "add", path: "/new", value: "new_value"}]); return obj;' as result;
+        select ~> 'require("jsonpatch").apply_patch({}, [{op: "add", path: "/new", value: "new_value"}])' as result;
         """
         it.should.deep.eq [ {result: { new: 'new_value'}}]
+        done!
+      .. 'should define jsonpatch as user function in pg', (done) ->
+        storage <- mount-storage plx, SCHEMA, TABLE
+        <- plx.query """
+        SELECT  proname
+        FROM    pg_catalog.pg_namespace n
+        JOIN    pg_catalog.pg_proc p
+        ON      pronamespace = n.oid
+        WHERE   nspname = 'public'
+        """
+        it.should.include.something.that.deep.equals proname: 'apply_patch'
         done!
 
