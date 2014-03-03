@@ -3,3 +3,4 @@ export function pgrest_schemaless_set (params)
   console.log query
   return plv8.execute query
 pgrest_schemaless_set.$plv8x = '(plv8x.json):plv8x.json'
+

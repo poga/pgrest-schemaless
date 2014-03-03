@@ -94,4 +94,26 @@ describe 'Storage' ->
         """
         it.should.deep.eq [ ret: new: 'new']
         done!
+      .. 'should define functions from user_func as user function in pg', (done) ->
+        storage <- mount-storage plx, SCHEMA, TABLE
+        <- plx.query """
+        SELECT  proname
+        FROM    pg_catalog.pg_namespace n
+        JOIN    pg_catalog.pg_proc p
+        ON      pronamespace = n.oid
+        WHERE   nspname = 'public'
+        """
+        console.log it
+        it.should.include.something.that.deep.equals proname: 'pgrest_schemaless_set'
+        #it.should.include.something.that.deep.equals proname: 'pgrest_schemaless_get'
+        done!
+      .. 'defined set functions should work properly', (done) ->
+        storage <- mount-storage plx, SCHEMA, TABLE
+        err, {row}? <- plx.conn.query "select pgrest_schemaless_set_uf($1) as ret" [{}]
+        console.log err
+        console.log row
+        throw err if err
+        ret <- plx['schemaless_set'].call plx, {patch: [op: 'add', path: '/new', value: 'new'], priority: 1}, _, (err) -> console.log err
+        console.log ret
+        done!
 
