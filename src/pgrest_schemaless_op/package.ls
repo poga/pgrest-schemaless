@@ -5,4 +5,4 @@ author:
 name: 'pgrest_schemaless_op'
 description: 'get/set operation for pggrest-schemaless'
 version: '0.0.1'
-main: \lib/index.js
+main: 'index.js'
