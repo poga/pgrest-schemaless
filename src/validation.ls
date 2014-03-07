@@ -1,6 +1,6 @@
 lo = require 'lodash-node'
 
-export function validate-storage-table-exists (plx, schema, table, cb)
+export function validate-table-exists (plx, schema, table, cb)
   query = """
   SELECT EXISTS(
     SELECT *
@@ -13,7 +13,7 @@ export function validate-storage-table-exists (plx, schema, table, cb)
   <- plx.query query
   cb? it[0].exists
 
-export function validate-storage-table-schema (plx, schema, table, cb)
+export function validate-table-schema (plx, schema, table, cb)
   <- plx.query """
   SELECT column_name, data_type
   FROM information_schema.columns

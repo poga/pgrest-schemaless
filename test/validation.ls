@@ -1,7 +1,7 @@
 should = (require \chai).should!
 {expect} = require \chai
 {mk-pgrest-fortest} = require \./testlib
-{validate-storage-table-exists, validate-storage-table-schema} = require \../lib/validation
+{validate-table-exists, validate-table-schema} = require \../lib/validation
 
 require! pgrest
 
@@ -25,7 +25,7 @@ describe 'Validation' ->
       done!
     describe 'validate-storage-table-exist', -> ``it``
       .. 'should return false if storage table doesn\'t exist' (done) ->
-        <- validate-storage-table-exists plx, SCHEMA, TABLE
+        <- validate-table-exists plx, SCHEMA, TABLE
         it.should.be.not.ok
         done!
       .. 'should return true if storage table exist' (done) ->
@@ -35,7 +35,7 @@ describe 'Validation' ->
           data json
         );
         """
-        <- validate-storage-table-exists plx, SCHEMA, TABLE
+        <- validate-table-exists plx, SCHEMA, TABLE
         it.should.be.ok
         done!
     describe 'validate-storage-table-schema', -> ``it``
@@ -46,7 +46,7 @@ describe 'Validation' ->
           foo int
         );
         """
-        <- validate-storage-table-schema plx, SCHEMA, TABLE
+        <- validate-table-schema plx, SCHEMA, TABLE
         it.should.not.ok
         done!
       .. 'should return true if storage table have a correct schema' (done) ->
@@ -56,6 +56,6 @@ describe 'Validation' ->
           data json
         );
         """
-        <- validate-storage-table-schema plx, SCHEMA, TABLE
+        <- validate-table-schema plx, SCHEMA, TABLE
         it.should.be.ok
         done!

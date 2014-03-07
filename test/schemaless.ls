@@ -1,10 +1,11 @@
 require! chai
 should = chai.should!
+assert = chai.assert
 chai.use require 'chai-things'
 {expect} = require \chai
 {mk-pgrest-fortest} = require \./testlib
-{mount-storage, create-storage-table} = require \../lib/storage
-{validate-storage-table-exists, validate-storage-table-schema} = require \../lib/validation
+{mount-schemaless, create-table} = require \../lib/schemaless
+{validate-table-exists, validate-table-schema} = require \../lib/validation
 lo = require 'lodash-node'
 
 require! pgrest
@@ -12,9 +13,9 @@ require! pgrest
 var plx
 
 SCHEMA = \public
-TABLE = \pgrest_schemaless_storage
+TABLE = \pgrest_schemaless
 
-describe 'Storage' ->
+describe 'Schemaless' ->
   beforeEach (done) ->
     _plx <- mk-pgrest-fortest!
     plx := _plx
@@ -26,15 +27,15 @@ describe 'Storage' ->
     afterEach (done) ->
       <- plx.query "DROP TABLE IF EXISTS #{TABLE};"
       done!
-    describe 'create-storage-table', -> ``it``
+    describe 'create-table', -> ``it``
       .. 'should create valid storage table', (done) ->
-        <- create-storage-table plx, SCHEMA, TABLE
-        <- validate-storage-table-exists plx, SCHEMA, TABLE
+        <- create-table plx, SCHEMA, TABLE
+        <- validate-table-exists plx, SCHEMA, TABLE
         it.should.be.ok
-        <- validate-storage-table-schema plx, SCHEMA, TABLE
+        <- validate-table-schema plx, SCHEMA, TABLE
         it.should.be.ok
         done!
-  describe 'mount storage' ->
+  describe 'mount' ->
     beforeEach (done) ->
       <- plx.query "DROP TABLE IF EXISTS #{TABLE};"
       done!
@@ -42,9 +43,9 @@ describe 'Storage' ->
       <- plx.query "DROP TABLE IF EXISTS #{TABLE};"
       done!
     describe 'when table does not exist', -> ``it``
-      .. 'should create table and return a Storage object', (done) ->
-        storage <- mount-storage plx, SCHEMA, TABLE
-        storage.should.be.ok
+      .. 'should create table', (done) ->
+        err <- mount-schemaless plx, SCHEMA, TABLE
+        assert.isUndefined err
         done!
     describe 'when a valid table already exists', -> ``it``
       .. 'should return a storage object with existing table', (done) ->
@@ -54,8 +55,8 @@ describe 'Storage' ->
           data json
         );
         """
-        storage <- mount-storage plx, SCHEMA, TABLE
-        storage.should.be.ok
+        err <- mount-schemaless plx, SCHEMA, TABLE
+        assert.isUndefined err
         done!
     describe 'when a invalid table already exists', -> ``it``
       .. 'should throw error', (done) ->
@@ -65,19 +66,19 @@ describe 'Storage' ->
           foo int
         );
         """
-        storage <- mount-storage plx, SCHEMA, TABLE
-        storage.should.be.an.instanceof Error
+        err <- mount-schemaless plx, SCHEMA, TABLE
+        err.should.be.an.instanceof Error
         done!
-    describe 'mount-storage', -> ``it``
+    describe 'mount-schemaless', -> ``it``
       .. 'should import jsonpatch into plv8', (done) ->
-        storage <- mount-storage plx, SCHEMA, TABLE
+        err <- mount-schemaless plx, SCHEMA, TABLE
         <- plx.query """
         select ~> 'require("jsonpatch").apply_patch({}, [{op: "add", path: "/new", value: "new_value"}])' as result;
         """
         it.should.deep.eq [ {result: { new: 'new_value'}}]
         done!
       .. 'should define jsonpatch as user function in pg', (done) ->
-        storage <- mount-storage plx, SCHEMA, TABLE
+        err <- mount-schemaless plx, SCHEMA, TABLE
         <- plx.query """
         SELECT  proname
         FROM    pg_catalog.pg_namespace n
@@ -88,14 +89,14 @@ describe 'Storage' ->
         it.should.include.something.that.deep.equals proname: 'apply_patch'
         done!
       .. 'imported user function should work properly', (done) ->
-        storage <- mount-storage plx, SCHEMA, TABLE
+        err <- mount-schemaless plx, SCHEMA, TABLE
         <- plx.query """
         select apply_patch('{}'::json, ARRAY['{"op": "add", "path": "/new", "value": "new"}'::json]) as ret;
         """
         it.should.deep.eq [ ret: new: 'new']
         done!
       .. 'should define functions from user_func as user function in pg', (done) ->
-        storage <- mount-storage plx, SCHEMA, TABLE
+        err <- mount-schemaless plx, SCHEMA, TABLE
         <- plx.query """
         SELECT  proname
         FROM    pg_catalog.pg_namespace n
@@ -106,15 +107,19 @@ describe 'Storage' ->
         it.should.include.something.that.deep.equals proname: 'pgrest_schemaless_set'
         #it.should.include.something.that.deep.equals proname: 'pgrest_schemaless_get'
         done!
-      .. 'defined set functions should work properly', (done) ->
-        storage <- mount-storage plx, SCHEMA, TABLE
-        err, {row}? <- plx.conn.query "select pgrest_schemaless_set_uf($1) as ret" [{}]
-        throw err if err
-        ret <- plx['schemaless_set'].call plx, {patch: [op: 'add', path: '/new', value: 'new'], priority: 1}, _, (err) -> console.log err
+      .. 'defined set functions should work correctly', (done) ->
+        err <- mount-schemaless plx, SCHEMA, TABLE
+        params =
+          table: TABLE
+          patch:
+            op: 'add'
+            path: '/new'
+            value: 'new'
+            priority: 1
+# TODO: init row with name
+        query-old = "select data from #{params.table}"
+        res <- plx.query query-old
+        console.log res
+        ret <- plx['schemaless_set'].call plx, params, _, (err) -> throw err
+        ret.should.deep.equals new: \new
         done!
-      .. 'plx should have wrapped defined function to call', (done) ->
-        storage <- mount-storage plx, SCHEMA, TABLE
-        ret <- plx[\schemaless_set].call plx, {}
-        ret.should.deep.eq [ ret: '{"new":"new"}']
-        done!
-
