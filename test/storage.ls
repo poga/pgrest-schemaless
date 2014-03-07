@@ -103,17 +103,18 @@ describe 'Storage' ->
         ON      pronamespace = n.oid
         WHERE   nspname = 'public'
         """
-        console.log it
         it.should.include.something.that.deep.equals proname: 'pgrest_schemaless_set'
         #it.should.include.something.that.deep.equals proname: 'pgrest_schemaless_get'
         done!
       .. 'defined set functions should work properly', (done) ->
         storage <- mount-storage plx, SCHEMA, TABLE
         err, {row}? <- plx.conn.query "select pgrest_schemaless_set_uf($1) as ret" [{}]
-        console.log err
-        console.log row
         throw err if err
         ret <- plx['schemaless_set'].call plx, {patch: [op: 'add', path: '/new', value: 'new'], priority: 1}, _, (err) -> console.log err
-        console.log ret
+        done!
+      .. 'plx should have wrapped defined function to call', (done) ->
+        storage <- mount-storage plx, SCHEMA, TABLE
+        ret <- plx[\schemaless_set].call plx, {}
+        ret.should.deep.eq [ ret: '{"new":"new"}']
         done!
 
