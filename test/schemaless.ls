@@ -133,7 +133,9 @@ describe 'Schemaless' ->
             value: 'new'
         storage <- create-storage plx, SCHEMA, TABLE, 'test'
         ret <- plx['schemaless_set'].call plx, params, _, (err) -> throw err
-        ret.should.deep.equals new: \new
+        ret.should.equals 1
+        <- plx.query "select data from #TABLE where name='test'"
+        it.0.data.should.deep.eq new: 'new'
         done!
       .. 'schemaless_get should return a child json based on specified path', (done) ->
         # TODO: not implemented

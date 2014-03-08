@@ -13,8 +13,7 @@ export function mount-user-funcs (plx, cb)
       # TODO: wrap this into a serializable transaction to avoid race condition
       err, {rows}? <- @conn.query "select pgrest_#{method}_uf($1) as ret", [params]
       return onError(err) if err
-      ret = rows.0.ret
-      cb? JSON.parse ret.0.ret
+      cb? rows.0.ret
   cb?!
 
 export function mount-schemaless (plx, schema, table, cb)
