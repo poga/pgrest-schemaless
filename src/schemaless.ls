@@ -1,3 +1,4 @@
+{Storage} = require './storage'
 {validate-table-exists, validate-table-schema} = require './validation'
 
 export function mount-user-funcs (plx, cb)
@@ -43,4 +44,4 @@ export function create-storage (plx, schema, table, name, cb)
   INSERT INTO #table (name, data)
   VALUES ('#name', '{}'::json);
   """
-  cb?!
+  cb? new Storage plx, schema, table, name

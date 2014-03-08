@@ -69,7 +69,7 @@ describe 'Schemaless' ->
         err <- mount-schemaless plx, SCHEMA, TABLE
         err.should.be.an.instanceof Error
         done!
-    describe 'storage', -> ``it``
+    describe 'storage row', -> ``it``
       .. 'should be created by create-storage', (done) ->
         <- plx.query """
         CREATE TABLE #TABLE (
@@ -77,7 +77,7 @@ describe 'Schemaless' ->
           data json
         );
         """
-        <- create-storage plx, SCHEMA, TABLE, "test"
+        storage <- create-storage plx, SCHEMA, TABLE, "test"
         <- plx.query """
         SELECT * from #TABLE;
         """
@@ -125,13 +125,14 @@ describe 'Schemaless' ->
         err <- mount-schemaless plx, SCHEMA, TABLE
         params =
           table: TABLE
+          name: \test
           patch:
             op: 'add'
             path: '/new'
             value: 'new'
             priority: 1
-# TODO: init row with name
-        query-old = "select data from #{params.table}"
+        storage <- create-storage plx, SCHEMA, TABLE, 'test'
+        query-old = "select data from #{params.table} where name='test'"
         res <- plx.query query-old
         console.log res
         ret <- plx['schemaless_set'].call plx, params, _, (err) -> throw err
