@@ -1,6 +1,6 @@
 {validate-table-exists, validate-table-schema} = require './validation'
 
-export function mount-all (plx, cb)
+export function mount-user-funcs (plx, cb)
   next <- plx.import-bundle-funcs 'jsonpatch', require.resolve("jsonpatch/package.json")
   <- next!
   <- plx.mk-user-func 'plv8x.json apply_patch(json, json[])', 'jsonpatch:apply_patch'
@@ -17,7 +17,7 @@ export function mount-all (plx, cb)
   cb?!
 
 export function mount-schemaless (plx, schema, table, cb)
-  <- mount-all plx
+  <- mount-user-funcs plx
   exists <- validate-table-exists plx, schema, table
   if exists
     valid <- validate-table-schema plx, schema, table
