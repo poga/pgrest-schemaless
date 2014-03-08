@@ -28,8 +28,5 @@ devDependencies:
   'chai-things': \*
   LiveScript: \1.2.x
   pgrest: \0.1.x
-  gulp: \*
-  'gulp-livescript': \*
-  'gulp-util': \*
 peerDependencies:
   pgrest: \0.1.x
