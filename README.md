@@ -7,7 +7,7 @@ This is not working at all right now, please check back later.
 
 # Concept
 
-image here...
+![](https://dl.dropboxusercontent.com/u/125794/pgrest-schemaless-concept.png)
 
 1. A Reference is a JSON Pointer point to a specified path to data JSON.
 2. References can use `set` to set the value of json it pointed to, generate a JSON Patch to local data JSON.
@@ -16,3 +16,4 @@ image here...
 5. Client then send the patch to server.
 6. Server take the patch, apply to the data json inside Postgres DB.
 7. Server then propagates the patch to other clients.
+
