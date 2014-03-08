@@ -121,20 +121,28 @@ describe 'Schemaless' ->
         it.should.include.something.that.deep.equals proname: 'pgrest_schemaless_set'
         #it.should.include.something.that.deep.equals proname: 'pgrest_schemaless_get'
         done!
-      .. 'defined set functions should work correctly', (done) ->
+      .. 'schemaless_set should apply a json patch to old json and update it', (done) ->
         err <- mount-schemaless plx, SCHEMA, TABLE
         params =
           table: TABLE
           name: \test
+          # RFC 6902 JSON Patch
           patch:
             op: 'add'
             path: '/new'
             value: 'new'
-            priority: 1
         storage <- create-storage plx, SCHEMA, TABLE, 'test'
-        query-old = "select data from #{params.table} where name='test'"
-        res <- plx.query query-old
-        console.log res
         ret <- plx['schemaless_set'].call plx, params, _, (err) -> throw err
         ret.should.deep.equals new: \new
+        done!
+      .. 'schemaless_get should return a child json based on specified path', (done) ->
+        # TODO: not implemented
+        err <- mount-schemaless plx, SCHEMA, TABLE
+        params =
+          table: TABLE
+          name: \test
+          path: "/new"
+        storage <- create-storage plx, SCHEMA, TABLE, 'test'
+        ret <- plx['schemaless_get'].call plx, params, _, (err) throw err
+        ret.should.deep.equals "something
         done!
