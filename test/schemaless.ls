@@ -143,6 +143,6 @@ describe 'Schemaless' ->
           name: \test
           path: "/new"
         storage <- create-storage plx, SCHEMA, TABLE, 'test'
-        ret <- plx['schemaless_get'].call plx, params, _, (err) throw err
+        ret <- plx['schemaless_get'].call plx, params, _, (err) -> throw err
         ret.should.deep.equals "something"
         done!
