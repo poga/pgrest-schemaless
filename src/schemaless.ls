@@ -8,7 +8,8 @@ export function mount-user-funcs (plx, cb)
   next <- plx.import-bundle-funcs 'pgrest_schemaless_op', require.resolve('./pgrest_schemaless_op/package.json')
   <- next!
   <- plx.mk-user-func 'plv8x.json pgrest_schemaless_set_uf(json)', 'pgrest_schemaless_op:pgrest_schemaless_set'
-  <[schemaless_set]>.forEach (method) ->
+  <- plx.mk-user-func 'plv8x.json pgrest_schemaless_get_uf(json)', 'pgrest_schemaless_op:pgrest_schemaless_get'
+  <[schemaless_set schemaless_get]>.forEach (method) ->
     plx[method] = (params, cb, onError) ->
       # TODO: wrap this into a serializable transaction to avoid race condition
       err, {rows}? <- @conn.query "select pgrest_#{method}_uf($1) as ret", [params]

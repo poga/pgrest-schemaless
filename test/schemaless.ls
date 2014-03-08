@@ -119,7 +119,7 @@ describe 'Schemaless' ->
         WHERE   nspname = 'public'
         """
         it.should.include.something.that.deep.equals proname: 'pgrest_schemaless_set'
-        #it.should.include.something.that.deep.equals proname: 'pgrest_schemaless_get'
+        it.should.include.something.that.deep.equals proname: 'pgrest_schemaless_get'
         done!
       .. 'schemaless_set should apply a json patch to old json and update it', (done) ->
         err <- mount-schemaless plx, SCHEMA, TABLE
@@ -137,14 +137,41 @@ describe 'Schemaless' ->
         <- plx.query "select data from #TABLE where name='test'"
         it.0.data.should.deep.eq new: 'new'
         done!
-      .. 'schemaless_get should return a child json based on specified path', (done) ->
-        # TODO: not implemented
+      .. 'schemaless_get should return a root json with root path("/")', (done) ->
         err <- mount-schemaless plx, SCHEMA, TABLE
-        params =
+        storage <- create-storage plx, SCHEMA, TABLE, 'test'
+        get-params =
           table: TABLE
           name: \test
-          path: "/new"
+          path: "/"
+        ret <- plx['schemaless_get'].call plx, get-params, _, (err) -> throw err
+        ret.should.deep.equals {}
+        set-params =
+          table: TABLE
+          name: \test
+          patch:
+            op: 'add'
+            path: '/foo'
+            value: { bar: \bar}
+        ret <- plx['schemaless_set'].call plx, set-params, _, (err) -> throw err
+        ret <- plx['schemaless_get'].call plx, get-params, _, (err) -> throw err
+        ret.should.deep.equals foo: bar: \bar
+        done!
+      .. 'schemaless_get should return child json specified by path', (done) ->
+        err <- mount-schemaless plx, SCHEMA, TABLE
         storage <- create-storage plx, SCHEMA, TABLE, 'test'
-        ret <- plx['schemaless_get'].call plx, params, _, (err) -> throw err
-        ret.should.deep.equals "something"
+        set-params =
+          table: TABLE
+          name: \test
+          patch:
+            op: 'add'
+            path: '/foo'
+            value: { bar: \bar}
+        ret <- plx['schemaless_set'].call plx, set-params, _, (err) -> throw err
+        get-params =
+          table: TABLE
+          name: \test
+          path: "/foo"
+        ret <- plx['schemaless_get'].call plx, get-params, _, (err) -> throw err
+        ret.should.deep.equals bar: \bar
         done!
