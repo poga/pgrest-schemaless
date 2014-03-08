@@ -38,3 +38,9 @@ export function create-table (plx, schema, table, cb)
   """
   cb?!
 
+export function create-storage (plx, schema, table, name, cb)
+  <- plx.query """
+  INSERT INTO #table (name, data)
+  VALUES ('#name', '{}'::json);
+  """
+  cb?!

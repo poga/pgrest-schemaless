@@ -23,12 +23,12 @@ describe 'Validation' ->
     afterEach (done) ->
       <- plx.query "DROP TABLE IF EXISTS #{TABLE};"
       done!
-    describe 'validate-storage-table-exist', -> ``it``
-      .. 'should return false if storage table doesn\'t exist' (done) ->
+    describe 'validate-table-exist', -> ``it``
+      .. 'should return false if table doesn\'t exist' (done) ->
         <- validate-table-exists plx, SCHEMA, TABLE
         it.should.be.not.ok
         done!
-      .. 'should return true if storage table exist' (done) ->
+      .. 'should return true if table exist' (done) ->
         <- plx.query """
         CREATE TABLE #TABLE (
           name text,
@@ -38,8 +38,8 @@ describe 'Validation' ->
         <- validate-table-exists plx, SCHEMA, TABLE
         it.should.be.ok
         done!
-    describe 'validate-storage-table-schema', -> ``it``
-      .. 'should return false if storage table does not have a correct schema' (done) ->
+    describe 'validate-table-schema', -> ``it``
+      .. 'should return false if table does not have a correct schema' (done) ->
         <- plx.query """
         CREATE TABLE #TABLE (
           name text,
@@ -49,7 +49,7 @@ describe 'Validation' ->
         <- validate-table-schema plx, SCHEMA, TABLE
         it.should.not.ok
         done!
-      .. 'should return true if storage table have a correct schema' (done) ->
+      .. 'should return true if table have a correct schema' (done) ->
         <- plx.query """
         CREATE TABLE #TABLE (
           name text,

@@ -4,7 +4,7 @@ assert = chai.assert
 chai.use require 'chai-things'
 {expect} = require \chai
 {mk-pgrest-fortest} = require \./testlib
-{mount-schemaless, create-table} = require \../lib/schemaless
+{mount-schemaless, create-table, create-storage} = require \../lib/schemaless
 {validate-table-exists, validate-table-schema} = require \../lib/validation
 lo = require 'lodash-node'
 
@@ -68,6 +68,20 @@ describe 'Schemaless' ->
         """
         err <- mount-schemaless plx, SCHEMA, TABLE
         err.should.be.an.instanceof Error
+        done!
+    describe 'storage', -> ``it``
+      .. 'should be created by create-storage', (done) ->
+        <- plx.query """
+        CREATE TABLE #TABLE (
+          name text,
+          data json
+        );
+        """
+        <- create-storage plx, SCHEMA, TABLE, "test"
+        <- plx.query """
+        SELECT * from #TABLE;
+        """
+        it.should.deep.eq [ name: \test, data: {}]
         done!
     describe 'mount-schemaless', -> ``it``
       .. 'should import jsonpatch into plv8', (done) ->
