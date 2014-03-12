@@ -9,8 +9,8 @@ export function isactive (opts)
 # To hook command line options processing.
 export function process-opts (opts)
   opts.schemaless = opts.argv.schemaless or opts.cfg.schemaless
-  opts.schemaless_schema = \public
-  opts.schemaless_table = \pgrest_schemaless
+  opts.schemaless_schema = opts.argv.schemaless_schema or \public
+  opts.schemaless_table = opts.argv.schemaless_table or \pgrest_schemaless
 
 # Plugin initialized
 # - called in load-plugins().
@@ -29,3 +29,4 @@ export function posthook-cli-create-server (opts, server)
     conn.on \data ->
       conn.write it
   sock.installHandlers server, prefix: '/schemaless'
+
