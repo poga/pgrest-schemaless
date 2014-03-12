@@ -18,7 +18,7 @@ scripts:
   """
 engines: {node: '*'}
 dependencies:
-  primus: \*
+  sockjs: \*
   'lodash-node': \*
   jsonpatch: \*
 devDependencies:
