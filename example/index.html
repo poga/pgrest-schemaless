@@ -1,0 +1,15 @@
+<script src="http://cdn.sockjs.org/sockjs-0.3.min.js"></script>
+<script>
+var sock = new SockJS('http://localhost:3000/schemaless');
+   sock.onopen = function() {
+     sock.send(JSON.stringify({op: 'add', path: '/new', value: { foo: 'bar'}}))
+     sock.send(JSON.stringify({op: 'get', path: '/'}));
+   };
+   sock.onmessage = function(e) {
+       console.log('message', e.data);
+   };
+   sock.onclose = function() {
+       console.log('close');
+   };
+</script>
+

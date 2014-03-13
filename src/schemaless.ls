@@ -22,11 +22,15 @@ export function mount-schemaless (plx, schema, table, cb)
   if exists
     valid <- validate-table-schema plx, schema, table
     if valid
+      plx.schemaless_table = table
+      plx.schemaless_schema = schema
       cb? void
     else
       cb new Error "#schema.#table already exists and does not have correct schema"
   else
     <- create-table(plx, schema, table)
+    plx.schemaless_table = table
+    plx.schemaless_schema = schema
     cb? void
 
 export function create-table (plx, schema, table, cb)

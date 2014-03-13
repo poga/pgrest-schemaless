@@ -1,6 +1,8 @@
 require! pgrest
 require! sockjs
-{mount-schemaless} = require './schemaless'
+{mount-schemaless, create-storage} = require './schemaless'
+
+var plx
 
 # To tell pgrest that the plugin is actived.
 export function isactive (opts)
@@ -11,22 +13,46 @@ export function process-opts (opts)
   opts.schemaless = opts.argv.schemaless or opts.cfg.schemaless
   opts.schemaless_schema = opts.argv.schemaless_schema or \public
   opts.schemaless_table = opts.argv.schemaless_table or \pgrest_schemaless
-
-# Plugin initialized
-# - called in load-plugins().
-export function initialize (opts)
-  void
+  unless opts.argv.schemaless_storage_name
+    throw "storage name is empty"
+  opts.schemaless_storage_name = opts.argv.schemaless_storage_name
 
 # To hook plx8 instance.
 # - called after plx8 is created in cli().
-export function posthook-cli-create-plx (opts, plx)
+export function posthook-cli-create-plx (opts, _plx)
+  _plx.schemaless_storage_name = opts.schemaless_storage_name
+  plx := _plx
   <- mount-schemaless plx, opts.schemaless_schema, opts.schemaless_table
+  <- create-storage plx, opts.schemaless_schema, opts.schemaless_table, opts.schemaless_storage_name
 
 export function posthook-cli-create-server (opts, server)
   sock = sockjs.createServer!
   do
     conn <- sock.on \connection
-    conn.on \data ->
-      conn.write it
+    conn.on \data -> handler conn, it
   sock.installHandlers server, prefix: '/schemaless'
 
+function handler (conn, message)
+  o = JSON.parse message
+  unless o.op
+    conn.write "error: invalid op"
+    return
+
+  switch o.op
+  | "get"
+    <- plx['schemaless_get'].call plx, {
+      table: plx.schemaless_table
+      name: plx.schemaless_storage_name
+      path: o.path
+    }, _, (err) -> throw err
+    conn.write JSON.stringify it
+  | <[add remove replace]>
+    <- plx['schemaless_set'].call plx, {
+      table: plx.schemaless_table
+      name: plx.schemaless_storage_name
+      patch:
+        op: o.op
+        path: o.path
+        value: o.value
+    }, _, (err) -> throw err
+    conn.write JSON.stringify it
