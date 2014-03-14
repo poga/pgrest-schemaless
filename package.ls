@@ -15,6 +15,7 @@ scripts:
   """
   prepublish: """
   lsc -bc -o lib src/
+  ./node_modules/browserify/bin/cmd.js lib/client.js -o example/pgrest_schemaless.js
   """
 engines: {node: '*'}
 dependencies:
@@ -28,5 +29,6 @@ devDependencies:
   'chai-things': \*
   LiveScript: \1.2.x
   pgrest: \0.1.x
+  browserify: \*
 peerDependencies:
   pgrest: \0.1.x

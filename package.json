@@ -15,7 +15,7 @@
   },
   "scripts": {
     "test": "mocha",
-    "prepublish": "lsc -bc -o lib src/"
+    "prepublish": "lsc -bc -o lib src/\n./node_modules/browserify/bin/cmd.js lib/client.js -o example/pgrest_schemaless.js"
   },
   "engines": {
     "node": "*"
@@ -31,7 +31,8 @@
     "chai": "*",
     "chai-things": "*",
     "LiveScript": "1.2.x",
-    "pgrest": "0.1.x"
+    "pgrest": "0.1.x",
+    "browserify": "*"
   },
   "peerDependencies": {
     "pgrest": "0.1.x"
