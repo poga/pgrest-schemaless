@@ -27,12 +27,15 @@ export function posthook-cli-create-plx (opts, _plx)
 
 export function posthook-cli-create-server (opts, server)
   sock = sockjs.createServer!
+  sock.broadcast = {}
   do
     conn <- sock.on \connection
-    conn.on \data -> handler conn, it
+    sock.broadcast[conn.id] = conn;
+    conn.on \data -> handler sock, conn, it
+    conn.on \close -> delete sock.broadcast[conn.id]
   sock.installHandlers server, prefix: '/schemaless'
 
-function handler (conn, message)
+function handler (sock, conn, message)
   o = JSON.parse message
   unless o.op
     conn.write "error: invalid op"
@@ -56,3 +59,5 @@ function handler (conn, message)
         value: o.value
     }, _, (err) -> throw err
     conn.write JSON.stringify it
+    for let id, c of sock.broadcast when id != conn.id
+      c.write "broadcast: #{JSON.stringify(o)}"
